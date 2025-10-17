@@ -1,0 +1,81 @@
+<!-- Local rules -->
+
+<!-- Modify it at your will. -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<!-- Example -->
+<group name="local,syslog,sshd,">
+
+  <!--
+  Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2
+  -->
+  <rule id="100001" level="5">
+    <if_sid>5716</if_sid>
+    <srcip>1.1.1.1</srcip>
+    <description>sshd: authentication failed from IP 1.1.1.1.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
+
+</group>
+
+<!-- Regras específicas para Huawei usando <match> -->
+<group name="local,huawei,">
+
+  <!-- Falha de login SSH -->
+  <rule id="100002" level="10">
+    <match>SSH_USER_LOGIN_FAIL</match>
+    <description>User authentication failure.</description>
+    <group>authentication_failed,huawei_ssh_fail,</group>
+  </rule>
+
+  <!-- Evento genérico para logs Huawei -->
+  <rule id="100100" level="3">
+    <match>%%01</match>
+    <description>Generic event detected from network device.</description>
+    <group>huawei,generic,</group>
+  </rule>
+
+  <!-- Login/logout de usuários -->
+  <rule id="100101" level="7">
+    <match>User Login|User Logout|Login failed|Logout successful</match>
+    <description>User login/logout activity detected on network device.</description>
+    <group>authentication,huawei_login,</group>
+  </rule>
+
+  <!-- Alteração de VLAN -->
+  <rule id="100110" level="8">
+    <match>VLAN configuration changed|VLAN .* added|VLAN .* removed</match>
+    <description>VLAN configuration change detected on network device.</description>
+    <group>configuration,huawei_vlan_change,</group>
+  </rule>
+
+  <!-- Mudança de estado de porta (up/down) -->
+  <rule id="100120" level="7">
+    <match>Interface .* changed state to (up|down)</match>
+    <description>Interface state change detected on network device.</description>
+    <group>network,huawei_interface_status,</group>
+  </rule>
+
+  <!-- Tentativas de acesso negadas -->
+  <rule id="100130" level="10">
+    <match>Login failed|authentication failure|Access denied</match>
+    <description>Access denied attempt detected on network device.</description>
+    <group>authentication_failed,huawei_access_denied,</group>
+  </rule>
+
+  <!-- Alterações de configuração -->
+  <rule id="100140" level="8">
+    <match>Configuration saved successfully|Config Change detected|Configuration modified</match>
+    <description>Configuration change detected on network device.</description>
+    <group>configuration,huawei_config_change,</group>
+  </rule>
+
+  <!-- Eventos de reboot ou falhas de hardware -->
+  <rule id="100150" level="10">
+    <match>System reboot|Hardware failure|Crash detected|Unexpected shutdown</match>
+    <description>Critical reboot or hardware failure event detected on network device.</description>
+    <group>system,huawei_reboot_failure,</group>
+  </rule>
+
+</group>
+
